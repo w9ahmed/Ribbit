@@ -2,13 +2,10 @@ package com.asyn.ribbit;
 
 import java.util.Locale;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
-
-import com.asyn.ribbit.MainActivity.PlaceholderFragment;
-
+import android.support.v4.app.Fragment;
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
  * one of the sections/tabs/pages.
@@ -23,11 +20,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
-    }
+    public Fragment getItem(int position) { // TODO check this error
+		return new InboxFragment(); }
 
     @Override
     public int getCount() {
