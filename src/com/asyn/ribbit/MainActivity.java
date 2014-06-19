@@ -31,6 +31,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+    
+    // PROJECT ADDED FROM PC THIS TIME
     ViewPager mViewPager;
 
     @Override
