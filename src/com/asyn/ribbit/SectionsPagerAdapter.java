@@ -2,10 +2,12 @@ package com.asyn.ribbit;
 
 import java.util.Locale;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.app.Fragment;
+
+
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
  * one of the sections/tabs/pages.
@@ -21,7 +23,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) { // TODO check this error
-		return new InboxFragment(); }
+    	if(position == 0)
+    		return new InboxFragment();
+    	else
+    		return new FriendsFragment();
+    }
 
     @Override
     public int getCount() {
