@@ -2,5 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.asyn.ribbit.MainActivity" >
     <item android:id="@+id/action_logout" android:title="@string/menu_logout_label"></item>
+    
+    <item android:id="@+id/action_add_friends" android:title="@string/menu_edit_friends_label"/>
 
 </menu>
