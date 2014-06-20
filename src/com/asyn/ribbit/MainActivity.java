@@ -1,12 +1,19 @@
 package com.asyn.ribbit;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
@@ -27,13 +35,24 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static final int PICK_PHOTO_REQUEST = 2;
     public static final int PICK_VIDEO_REQUEST = 3;
     
+    public static final int MEDIA_TYPE_IMAGE = 4;
+    public static final int MEDIA_TYPE_VIDEO = 5;
+    
+    protected Uri mMediaUri;
+    
     protected DialogInterface.OnClickListener mDialogListener = new OnClickListener() {		
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			switch (which) {
 				case 0:
 					Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-					startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
+					mMediaUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+					if(mMediaUri == null)
+						Toast.makeText(MainActivity.this, R.string.error_external_storage, Toast.LENGTH_LONG).show();
+					else {
+						takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+						startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
+					}
 					break;
 				case 1:
 					Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -45,6 +64,49 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					break;
 			}
 		}
+
+		private Uri getOutputMediaFileUri(int mediaType) {
+			String appName = MainActivity.this.getString(R.string.app_name);
+			if(isExternalStorageAvaialble()) {
+				// Get the external storage directory
+				File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), appName);
+				// Create subdirectory
+				if(!mediaStorageDir.exists())
+					if(!mediaStorageDir.mkdirs()) {
+						Log.e(TAG, "Failed to create directory.");
+						return null;
+					}
+				
+				// Create a file name
+				
+				// create the file
+				File mediaFile;
+				Date now = new Date();
+				String timestamp = new SimpleDateFormat("yyyMMdd_HHmmss", Locale.US).format(now);
+				
+				String path = mediaStorageDir.getPath() + File.separator;
+				if(mediaType == MEDIA_TYPE_IMAGE) {
+					mediaFile = new File(path + "IMG_" + timestamp + ".jpg");
+				} else if(mediaType == MEDIA_TYPE_VIDEO) {
+					mediaFile = new File(path + "VID_" + timestamp + ".mp4");
+				} else
+					return null;
+				
+				// Return the Uri
+				return Uri.fromFile(mediaFile);
+			}
+			else
+				return null;
+		}
+		
+		private boolean isExternalStorageAvaialble() {
+			String state = Environment.getExternalStorageState();
+			if(state.equals(Environment.MEDIA_MOUNTED))
+				return true;
+			else
+				return false;
+		}
+		
 	};
 
 	/**
