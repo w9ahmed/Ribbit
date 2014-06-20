@@ -75,7 +75,7 @@ public class EditFriendsActivity extends ListActivity {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							EditFriendsActivity.this);
 					builder.setMessage(e.getMessage())
-							.setTitle(R.string.signup_error_title)
+							.setTitle(R.string.error_title)
 							.setPositiveButton(android.R.string.ok, null);
 					AlertDialog dialog = builder.create();
 					dialog.show();
@@ -85,13 +85,6 @@ public class EditFriendsActivity extends ListActivity {
 		});
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.edit_friends, menu);
-		return true;
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -110,23 +103,18 @@ public class EditFriendsActivity extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 		if (getListView().isItemChecked(position)) {
 			mFriendsRelation.add(mUsers.get(position));
-			mCurrentUser.saveInBackground(new SaveCallback() {
-				@Override
-				public void done(ParseException e) {
-					if (e != null)
-						Log.e(TAG, e.getMessage());
-				}
-			});
 		} else {
 			mFriendsRelation.remove(mUsers.get(position));
-			mCurrentUser.saveInBackground(new SaveCallback() {				
-				@Override
-				public void done(ParseException e) {
-					if (e != null)
-						Log.e(TAG, e.getMessage());
-				}
-			});
 		} // end if else
+		
+		mCurrentUser.saveInBackground(new SaveCallback() {				
+			@Override
+			public void done(ParseException e) {
+				if (e != null)
+					Log.e(TAG, e.getMessage());
+			}
+		});
+		
 	}
 	
 	private void addFriendCheckmarks() {
