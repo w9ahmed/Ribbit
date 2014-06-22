@@ -1,9 +1,11 @@
 package com.asyn.ribbit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -14,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -25,6 +28,8 @@ public class RecipientsActivity extends ListActivity {
 	protected List<ParseUser> mFriends;
 	protected ParseRelation<ParseUser> mFriendsRelation;
 	protected ParseUser mCurrentUser;
+	
+	protected MenuItem mSendMenuItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +90,8 @@ public class RecipientsActivity extends ListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.recipients, menu);
+		mSendMenuItem = menu.getItem(0);
 		return true;
 	}
 
@@ -97,10 +101,40 @@ public class RecipientsActivity extends ListActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_send) {
+			ParseObject message = createMessage();
+			//send(message);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private ParseObject createMessage() {
+		ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
+		message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
+		message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+		message.put(ParseConstants.KEY_RECIPIENTS_IDS, getRecipientIds());
+		return message;
+	}
+	
+	protected ArrayList<String> getRecipientIds() {
+		ArrayList<String> recipientIds = new ArrayList<String>();
+		for(int i = 0; i<getListView().getCount(); i++) {
+			if(getListView().isItemChecked(i)) {
+				recipientIds.add(mFriends.get(i).getObjectId());
+			}
+		}
+		return recipientIds;
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		if(l.getCheckedItemCount()>0)
+			mSendMenuItem.setVisible(true);
+		else {
+			mSendMenuItem.setVisible(false);
+		}
 	}
 
 
