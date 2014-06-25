@@ -1,5 +1,6 @@
 package com.asyn.ribbit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListFragment;
@@ -51,8 +52,15 @@ public class InboxFragment extends ListFragment {
 						i++;
 					}
 					
-					MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-					setListAdapter(adapter);
+					MessageAdapter adapter;
+					if (getListView().getAdapter() == null) {
+						adapter = new MessageAdapter(
+								getListView().getContext(), mMessages);
+						setListAdapter(adapter);
+					} else {
+						((MessageAdapter) getListView().getAdapter()).refill(mMessages);
+					}
+
 				}
 			}
 		});
@@ -73,6 +81,24 @@ public class InboxFragment extends ListFragment {
     		intent.setData(fileUri);
     		startActivity(intent);
     	} else {
+    		Intent intent = new Intent(Intent.ACTION_VIEW, fileUri);
+    		intent.setDataAndType(fileUri, "video/*");
+    		startActivity(intent);
+    	}
+    	
+    	// Delete it.
+    	List<String> ids = message.getList(ParseConstants.KEY_RECIPIENTS_IDS);
+    	if(ids.size() == 1) {
+    		// last recipient : delete the whole message
+    		message.deleteInBackground();
+    	} else {
+    		// remove the recipient and save
+    		ids.remove(ParseUser.getCurrentUser().getObjectId());
+    		ArrayList<String> idsToRemove = new ArrayList<String>();
+    		idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+    		
+    		message.removeAll(ParseConstants.KEY_RECIPIENTS_IDS, idsToRemove);
+    		message.saveInBackground();
     		
     	}
     	
